@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMI Calculator</title>
+    <!-- Tailwind CSS for modern styling and responsiveness -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-4xl mx-4 my-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">EMI Calculator</h1>
+        
+        <!-- Main Calculator Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Input Section -->
+            <div class="flex flex-col space-y-6">
+                <h2 class="text-xl font-semibold text-gray-700">Inputs to be Filled</h2>
+                
+                <!-- Input fields -->
+                <!-- Removed Property Value input as requested -->
+                <div>
+                    <label for="annualInterestRate" class="block text-sm font-medium text-gray-600">Annual Interest Rate (%)</label>
+                    <input type="number" id="annualInterestRate" value="7.35" step="0.01" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="monthlyNetSalary" class="block text-sm font-medium text-gray-600">Monthly Net Salary (INR)</label>
+                    <input type="number" id="monthlyNetSalary" value="100000" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="currentAge" class="block text-sm font-medium text-gray-600">Current Age (Years)</label>
+                    <input type="number" id="currentAge" value="25" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="obligation" class="block text-sm font-medium text-gray-600">Obligation (if any, INR)</label>
+                    <input type="number" id="obligation" value="0" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                </div>
+                
+                <!-- Backend Calculation Details Section -->
+                <div class="mt-6">
+                    <h2 class="text-xl font-semibold text-gray-700">Bank / Policy Details (Adjustable)</h2>
+                    <p class="text-sm text-gray-500 italic mb-4">These are the backend values for the calculations.</p>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="maxFoir" class="block text-sm font-medium text-gray-600">Max FOIR (e.g., 0.50 for 50%)</label>
+                            <input type="number" id="maxFoir" value="0.65" step="0.01" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="retirementAge" class="block text-sm font-medium text-gray-600">Retirement Age (Max Age for Loan End)</label>
+                            <input type="number" id="retirementAge" value="60" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm">
+                        </div>
+                        <!-- Removed Max Loan-to-Value (LTV) Ratio input as requested -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="flex flex-col space-y-6">
+                <h2 class="text-xl font-semibold text-gray-700">Calculated Outcomes</h2>
+                
+                <div class="bg-gray-50 p-4 rounded-lg shadow-inner">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                        <span class="text-sm font-medium text-gray-700">Monthly EMI By Income</span>
+                        <span id="monthlyEmiByIncome" class="text-base font-semibold text-sky-600"></span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                        <span class="text-sm font-medium text-gray-700">Tenure for Loan by Retirement Age (Years)</span>
+                        <span id="tenureByRetirementAge" class="text-base font-semibold text-sky-600"></span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                        <span class="text-sm font-medium text-gray-700">Loan by Income (INR)</span>
+                        <span id="loanByIncome" class="text-base font-semibold text-sky-600"></span>
+                    </div>
+                    <!-- Removed Loan by Property Value output as requested -->
+                    <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                        <span class="text-sm font-medium text-gray-700">Loan by Property Value or Income (whichever is less) (INR)</span>
+                        <span id="loanWhicheverIsLess" class="text-base font-semibold text-sky-600"></span>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-4 bg-sky-100 border border-sky-300 rounded-lg shadow-md">
+                    <h3 class="text-lg font-bold text-sky-800">Actual EMI to Be Paid</h3>
+                    <p id="actualEmi" class="text-3xl font-extrabold text-sky-600 mt-2"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements for inputs
+        // Removed propertyValueInput as requested
+        const annualInterestRateInput = document.getElementById('annualInterestRate');
+        const monthlyNetSalaryInput = document.getElementById('monthlyNetSalary');
+        const currentAgeInput = document.getElementById('currentAge');
+        const obligationInput = document.getElementById('obligation');
+        const maxFoirInput = document.getElementById('maxFoir');
+        const retirementAgeInput = document.getElementById('retirementAge');
+        // Removed maxLtvInput as requested
+
+        // DOM elements for outputs
+        const monthlyEmiByIncomeEl = document.getElementById('monthlyEmiByIncome');
+        const tenureByRetirementAgeEl = document.getElementById('tenureByRetirementAge');
+        const loanByIncomeEl = document.getElementById('loanByIncome');
+        // Removed loanByPropertyValueEl as requested
+        const loanWhicheverIsLessEl = document.getElementById('loanWhicheverIsLess');
+        const actualEmiEl = document.getElementById('actualEmi');
+
+        // Function to format numbers with commas
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-IN').format(Math.round(num));
+        }
+
+        // Main calculation function
+        function calculate() {
+            // Removed propertyValue and maxLtv variables as requested
+            const annualInterestRate = parseFloat(annualInterestRateInput.value) || 0;
+            const monthlyNetSalary = parseFloat(monthlyNetSalaryInput.value) || 0;
+            const currentAge = parseFloat(currentAgeInput.value) || 0;
+            const obligation = parseFloat(obligationInput.value) || 0;
+            const maxFoir = parseFloat(maxFoirInput.value) || 0;
+            const retirementAge = parseFloat(retirementAgeInput.value) || 0;
+
+            // Check for valid inputs
+            if (isNaN(annualInterestRate) || isNaN(monthlyNetSalary) || isNaN(currentAge) || isNaN(obligation) || isNaN(maxFoir) || isNaN(retirementAge)) {
+                return;
+            }
+
+            // (1) Monthly EMI By Income
+            // Formula: Monthly Net salary * Max foir - Obligation if Any
+            const monthlyEmiByIncome = (monthlyNetSalary * maxFoir) - obligation;
+            monthlyEmiByIncomeEl.textContent = `₹${formatNumber(monthlyEmiByIncome)}`;
+            
+            // (2) Tenure for Loan by Retirement age
+            // Formula: Retirement age - Current age (max 30 years)
+            let tenureByRetirementAge = retirementAge - currentAge;
+            if (tenureByRetirementAge > 30) {
+                tenureByRetirementAge = 30;
+            }
+            tenureByRetirementAgeEl.textContent = `${tenureByRetirementAge} years`;
+
+            // Calculate monthly rate and total number of payments
+            const monthlyRate = (annualInterestRate / 100) / 12;
+            const totalPayments = tenureByRetirementAge * 12;
+
+            // Helper function for PMT (Payment) calculation
+            function PMT(rate, nper, pv) {
+                if (rate === 0) return pv / nper;
+                const pmt = pv * rate * Math.pow(1 + rate, nper) / (Math.pow(1 + rate, nper) - 1);
+                return pmt;
+            }
+
+            // Helper function for PV (Present Value) calculation
+            function PV(rate, nper, pmt) {
+                if (rate === 0) return pmt * nper;
+                return pmt * (1 - Math.pow(1 + rate, -nper)) / rate;
+            }
+
+            let loanByIncome = 0;
+            if (monthlyRate > 0 && totalPayments > 0) {
+                // Loan by income
+                // Formula: PV(Annual Interest Rate/100/12, Tenure for Loan by Retirment age *12, -monthly emi by income)
+                loanByIncome = PV(monthlyRate, totalPayments, monthlyEmiByIncome);
+            }
+            loanByIncomeEl.textContent = `₹${formatNumber(loanByIncome)}`;
+            
+            // Removed Loan by Property value calculation as requested
+            
+            // Loan By Property value or Income (Which ever is less)
+            // With Property Value and LTV removed, the loan is simply the Loan by Income amount.
+            const loanWhicheverIsLess = loanByIncome;
+            loanWhicheverIsLessEl.textContent = `₹${formatNumber(loanWhicheverIsLess)}`;
+
+            let actualEmi = 0;
+            if (monthlyRate > 0 && totalPayments > 0) {
+                // Actual Emi to Be paid
+                // Formula: PMT(Annual Interest Rate/100/12, Tenure for loan By retirement age *12, -Loan by property value or income(whichever is less))
+                actualEmi = PMT(monthlyRate, totalPayments, loanWhicheverIsLess);
+            }
+            actualEmiEl.textContent = `₹${formatNumber(actualEmi)}`;
+        }
+
+        // Add event listeners to all input fields
+        // Removed propertyValueInput and maxLtvInput from the event listener list
+        [annualInterestRateInput, monthlyNetSalaryInput, currentAgeInput, obligationInput, maxFoirInput, retirementAgeInput].forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+
+        // Initial calculation on page load
+        document.addEventListener('DOMContentLoaded', calculate);
+    </script>
+</body>
+</html>
